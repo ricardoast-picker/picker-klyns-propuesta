@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Picker × Farmacias Klyns — Propuesta v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: hsl(212 100% 97%); --card: hsl(0 0% 100%); --border: hsl(214 33% 91%);
+      --text: hsl(229 35% 16%); --sub: hsl(222 18% 38%); --muted: hsl(216 30% 60%);
+      --celeste: hsl(193 100% 45%); --celeste-dim: hsl(193 100% 45% / .12); --celeste-mid: hsl(193 100% 45% / .3);
+      --green: hsl(162 100% 36%); --green-dim: hsl(162 100% 44% / .12); --green-mid: hsl(162 100% 44% / .3); --green-text: hsl(162 100% 28%);
+      --amber: hsl(43 100% 45%); --amber-bg: hsl(43 100% 67% / .15);
+      --red: hsl(346 100% 45%); --red-bg: hsl(346 100% 63% / .1);
+    }
+    html, body { height: 100%; background: var(--bg); font-family: 'Montserrat', sans-serif; color: var(--text); overflow: hidden; }
+    #deck { width: 100vw; height: 100vh; position: relative; }
+    .slide { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 48px 66px; opacity: 0; transform: translateX(36px); transition: opacity .4s cubic-bezier(.4,0,.2,1), transform .4s cubic-bezier(.4,0,.2,1); pointer-events: none; overflow: hidden; background: var(--bg); }
+    .slide.active { opacity: 1; transform: translateX(0); pointer-events: all; }
+    .slide.exit { opacity: 0; transform: translateX(-36px); }
+    #nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; z-index: 100; }
+    .nav-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; box-shadow: 0 1px 4px hsl(229 35% 16% / .08); }
+    .nav-btn:hover { border-color: var(--celeste); color: var(--celeste); }
+    .nav-btn:disabled { opacity: .35; cursor: default; }
+    .nav-btn svg { width: 14px; height: 14px; }
+    #indicators { display: flex; gap: 6px; align-items: center; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: all .25s; cursor: pointer; }
+    .dot.on { background: var(--celeste); width: 20px; border-radius: 3px; }
+    #slide-num { position: fixed; top: 20px; right: 26px; font-size: 11px; color: var(--muted); letter-spacing: .05em; font-weight: 600; }
+    .tag { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--green-text); border: 1px solid var(--green-mid); background: var(--green-dim); padding: 4px 12px; border-radius: 4px; margin-bottom: 14px; }
+    .tag.blue { color: var(--celeste); border-color: var(--celeste-mid); background: var(--celeste-dim); }
+    .tag.amber { color: var(--amber); border-color: hsl(43 100% 45% / .3); background: var(--amber-bg); }
+    .tag.red { color: var(--red); border-color: hsl(346 100% 45% / .25); background: var(--red-bg); }
+    h1 { font-size: clamp(32px, 4.2vw, 58px); font-weight: 800; line-height: 1.05; }
+    h2 { font-size: clamp(18px, 2.4vw, 33px); font-weight: 700; line-height: 1.15; }
+    .sub { font-size: clamp(11px, 1vw, 13.5px); color: var(--sub); font-weight: 400; line-height: 1.65; }
+    .content { position: relative; z-index: 1; width: 100%; max-width: 1100px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 6px hsl(229 35% 16% / .06); }
+    .card-sm { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; box-shadow: 0 1px 4px hsl(229 35% 16% / .05); }
+    .card-accent { background: var(--green-dim); border: 1px solid var(--green-mid); border-radius: 14px; padding: 16px 20px; }
+    .card-celeste { background: var(--celeste-dim); border: 1px solid var(--celeste-mid); border-radius: 14px; padding: 16px 20px; }
+    .card-red { background: var(--red-bg); border: 1px solid hsl(346 100% 45% / .25); border-radius: 14px; padding: 16px 20px; }
+    .card-amber { background: var(--amber-bg); border: 1px solid hsl(43 100% 45% / .3); border-radius: 14px; padding: 14px 18px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; width: 100%; }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 4px hsl(229 35% 16% / .05); }
+    .stat .val { font-size: clamp(20px, 2.5vw, 32px); font-weight: 800; }
+    .stat .val.b { color: var(--celeste); } .stat .val.g { color: var(--green-text); } .stat .val.a { color: var(--amber); } .stat .val.r { color: var(--red); }
+    .stat .lbl { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+    .stat .desc { font-size: 11px; color: var(--sub); margin-top: 2px; }
+    .tbl { width: 100%; border-collapse: collapse; }
+    .tbl th { font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; padding: 7px 10px; text-align: left; border-bottom: 2px solid var(--border); }
+    .tbl th.r { text-align: right; }
+    .tbl td { padding: 9px 10px; font-size: 12px; font-weight: 500; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl .total td { font-weight: 800; font-size: 13px; border-top: 2px solid var(--border); }
+    .tbl .hl td { background: hsl(162 100% 44% / .07); }
+    .tbl .r { text-align: right; }
+    .tbl .g { color: var(--green-text) !important; font-weight: 700 !important; }
+    .tbl .a { color: var(--amber) !important; font-weight: 700 !important; }
+    .tbl .dim { color: var(--muted) !important; font-size: 11px !important; }
+    .tbl .center { text-align: center; }
+    .picker-mark { font-size: 13px; font-weight: 800; letter-spacing: .07em; color: var(--celeste); }
+    .row-list { display: flex; flex-direction: column; gap: 6px; }
+    .row-item { display: flex; align-items: flex-start; gap: 9px; font-size: 11.5px; font-weight: 500; color: var(--sub); line-height: 1.5; }
+    .row-dot { min-width: 6px; height: 6px; border-radius: 50%; background: var(--celeste); margin-top: 4px; flex-shrink: 0; }
+    .row-dot.g { background: var(--green); } .row-dot.a { background: var(--amber); } .row-dot.r { background: var(--red); }
+    .step-num { min-width: 28px; height: 28px; border-radius: 50%; background: var(--celeste-dim); border: 1px solid var(--celeste-mid); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: var(--celeste); flex-shrink: 0; }
+    .check-ok { width: 18px; height: 18px; border-radius: 50%; background: var(--green-dim); border: 1.5px solid var(--green-mid); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-size: 9px; color: var(--green-text); font-weight: 900; }
+    .check-no { width: 18px; height: 18px; border-radius: 50%; background: var(--red-bg); border: 1.5px solid hsl(346 100% 45%/.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-size: 9px; color: var(--red); font-weight: 900; }
+    .check-row { display: flex; gap: 9px; align-items: flex-start; }
+    .flow-arrow { font-size: 18px; color: var(--border); flex-shrink: 0; align-self: center; }
+    .rule-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 11px; }
+    .rule-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 3px; }
+  </style>
+</head>
+<body>
+<div id="deck">
+
+<!-- ═══ SLIDE 1 · PORTADA ═══ -->
+<div class="slide active">
+  <div class="content" style="display:flex;flex-direction:column;gap:26px;max-width:840px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="picker-mark">PICKER</span>
+      <span style="color:var(--border);font-size:18px;font-weight:300;">×</span>
+      <span style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.06em;">FARMACIAS KLYNS</span>
+    </div>
+    <div>
+      <h1>Logística sin iguala fija.<br/><span style="color:var(--celeste);">Klyns paga por resultado.</span></h1>
+      <div style="width:72px;height:4px;background:var(--celeste);border-radius:2px;margin-top:20px;"></div>
+    </div>
+    <p class="sub" style="max-width:520px;font-size:14px;">De $720K/mes en costo fijo a orquestación inteligente —<br/>más rápido al cliente, menos costo, datos propios.</p>
+    <div style="display:flex;gap:32px;padding-top:6px;">
+      <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:4px;">Para</div><div style="font-size:14px;font-weight:700;">Miguel Llama · Antonio</div></div>
+      <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:4px;">Fecha</div><div style="font-size:14px;font-weight:700;">Junio 2026</div></div>
+      <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:4px;">Presentado por</div><div style="font-size:14px;font-weight:700;">Ricardo Astorga · Picker Express</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 2 · LO QUE SABEMOS ═══ -->
+<div class="slide">
+  <div class="content" style="display:flex;flex-direction:column;gap:16px;">
+    <div>
+      <div class="tag blue">Datos confirmados · Discovery 2 jun 2026</div>
+      <h2>Lo que sabemos de la operación de Klyns.</h2>
+    </div>
+    <div class="grid4">
+      <div class="stat"><div class="lbl">Sucursales</div><div class="val b">50+</div><div class="desc">9 nodos + satélites · La Laguna</div></div>
+      <div class="stat"><div class="lbl">Pedidos / mes</div><div class="val">6,500</div><div class="desc">CC + página web · VTEX</div></div>
+      <div class="stat"><div class="lbl">Costo proveedor</div><div class="val r">$720K</div><div class="desc">MXN/mes · iguala fija</div></div>
+      <div class="stat"><div class="lbl">SLA objetivo</div><div class="val a">~1 hr</div><div class="desc">Desde pedido hasta entrega</div></div>
+    </div>
+    <div class="grid2" style="gap:14px;align-items:start;">
+      <div class="card" style="padding:16px 20px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;">Proveedor tercero — 3 servicios bajo una iguala</div>
+        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 90px 70px;padding:8px 12px;background:hsl(43 100% 67%/.1);border-bottom:1px solid var(--border);">
+            <span style="font-size:12px;font-weight:700;">Domicilio + transferencias</span>
+            <span style="font-size:11px;color:var(--amber);font-weight:700;text-align:right;">~$576K</span>
+            <span style="font-size:10px;color:var(--muted);text-align:right;">80%</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 90px 70px;padding:8px 12px;border-bottom:1px solid var(--border);">
+            <span style="font-size:11.5px;color:var(--sub);">Valija · 50 sucursales/día</span>
+            <span style="font-size:11px;color:var(--muted);text-align:right;">~$30K</span>
+            <span style="font-size:10px;color:var(--muted);text-align:right;">4%</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 90px 70px;padding:8px 12px;">
+            <span style="font-size:11.5px;color:var(--sub);">Mensajería institucional</span>
+            <span style="font-size:11px;color:var(--muted);text-align:right;">~$15K</span>
+            <span style="font-size:10px;color:var(--muted);text-align:right;">2%</span>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);">18 motos · plataforma GPS GEDI del proveedor · sin tracking para cliente final</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card" style="padding:13px 18px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:9px;">Pedidos y operación</div>
+          <div class="row-list">
+            <div class="row-item"><div class="row-dot"></div><span><strong>CC</strong> — 15 personas · CRM asignación por código postal · 15 CC incl. web</span></div>
+            <div class="row-item"><div class="row-dot"></div><span><strong>Web VTEX</strong> — pedido cae automático, CC libera al nodo correspondiente</span></div>
+            <div class="row-item"><div class="row-dot a"></div><span><strong>14-16%</strong> de pedidos llevan transferencia inter-sucursal previa a la entrega</span></div>
+            <div class="row-item"><div class="row-dot"></div><span>Ticket: ~$600 local · $1K–1.7K e-com · <strong>30-40% sobre $2,000 MXN</strong> · cobran efectivo</span></div>
+          </div>
+        </div>
+        <!-- DATO CLAVE: datos propios con Picker -->
+        <div style="background:var(--text);border-radius:12px;padding:14px 18px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-10px;right:-10px;font-size:60px;opacity:.07;">📊</div>
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--celeste);margin-bottom:7px;">Con Picker · tus datos, tu ventaja</div>
+          <p style="font-size:12px;color:hsl(212 100% 90%);line-height:1.55;margin-bottom:8px;">Cada envío genera data propia de Klyns: SLA real, costo por zona, efectividad por carrier, picos de demanda. La convertimos en <strong style="color:white;">paneles a la medida y reportes ejecutivos</strong> — consultoría operativa continua, incluida.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:hsl(193 100% 45%/.2);border:1px solid hsl(193 100% 45%/.4);color:var(--celeste);font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;">Dashboard propio</span>
+            <span style="background:hsl(193 100% 45%/.2);border:1px solid hsl(193 100% 45%/.4);color:var(--celeste);font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;">Métricas por zona</span>
+            <span style="background:hsl(193 100% 45%/.2);border:1px solid hsl(193 100% 45%/.4);color:var(--celeste);font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;">Optimización continua</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 3 · DIAGNÓSTICO ═══ -->
+<div class="slide">
+  <div class="content" style="display:flex;flex-direction:column;gap:18px;">
+    <div>
+      <div class="tag red">Diagnóstico</div>
+      <h2>Tres razones por las que tu canal VTEX<br/>necesita un orquestador propio.</h2>
+    </div>
+    <div class="grid3" style="gap:14px;">
+      <div class="card" style="border-top:3px solid var(--red);">
+        <div style="font-size:26px;margin-bottom:8px;">🛍️</div>
+        <div style="font-weight:800;font-size:14px;margin-bottom:7px;">Tu cliente de mayor ticket tiene la peor experiencia</div>
+        <p class="sub" style="font-size:11.5px;margin-bottom:10px;">Los 1,500 pedidos VTEX son tu ticket promedio más alto ($1K–$1.7K). Ese cliente compró en línea esperando experiencia digital. Sin tracking ni WhatsApp, no sabe dónde está su pedido. Cuando falla, no vuelve.</p>
+        <div style="padding:8px 12px;background:var(--red-bg);border-radius:8px;font-size:11px;color:var(--red);font-weight:600;">70% de clientes que no reciben en tiempo no vuelven a pedir · el canal de mayor valor da la peor experiencia post-compra</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--amber);display:flex;flex-direction:column;">
+        <div style="font-size:26px;margin-bottom:8px;">📈</div>
+        <div style="font-weight:800;font-size:14px;margin-bottom:7px;">Crecer en VTEX presiona la iguala del proveedor</div>
+        <p class="sub" style="font-size:11.5px;margin-bottom:10px;">La iguala cubre 18 motos a capacidad. Si VTEX crece de 1,500 a 3,000 pedidos, el proveedor necesita más motos — y la iguala sube. El crecimiento digital tiene un techo de capacidad fija que hoy no puedes romper.</p>
+        <div style="flex:1;"></div>
+        <div style="padding:10px 12px;background:var(--green-dim);border:1px solid var(--green-mid);border-radius:8px;margin-top:6px;">
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--green-text);margin-bottom:5px;">Con Picker →</div>
+          <div class="row-list">
+            <div class="row-item"><div class="row-dot g"></div><span style="font-size:11px;">Cada pedido VTEX nuevo es costo variable · no toca la iguala</span></div>
+            <div class="row-item"><div class="row-dot g"></div><span style="font-size:11px;">Picker escala con tu canal digital sin negociar más flota</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--celeste);">
+        <div style="font-size:26px;margin-bottom:8px;">🗂️</div>
+        <div style="font-weight:800;font-size:14px;margin-bottom:7px;">No eres dueño del historial de tu operación</div>
+        <p class="sub" style="font-size:11.5px;margin-bottom:10px;">Los datos de cada entrega viven en GEDI, el sistema del proveedor. Klyns no tiene acceso real a SLA por zona ni eficiencia por carrier. Cuando venza el contrato, ese historial se va con ellos.</p>
+        <div style="padding:8px 12px;background:var(--celeste-dim);border-radius:8px;font-size:11px;color:var(--celeste);font-weight:600;">Con Picker: dashboard propio · datos 100% de Klyns · palanca real para renegociar la iguala cuando venza el contrato</div>
+      </div>
+    </div>
+    <div style="background:var(--text);border-radius:16px;padding:18px 28px;display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;align-items:center;gap:0;">
+      <div style="text-align:center;padding:0 20px;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:6px;">Ticket VTEX promedio</div>
+        <div style="font-size:48px;font-weight:900;color:white;line-height:1;">$1,300</div>
+        <div style="font-size:11px;color:hsl(212 60% 65%);margin-top:4px;">MXN · tu canal de mayor valor</div>
+      </div>
+      <div style="width:1px;height:60px;background:hsl(0 0% 100%/.12);"></div>
+      <div style="text-align:center;padding:0 20px;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--celeste);margin-bottom:6px;">Ese cliente hoy espera ~60 min y no tiene tracking</div>
+        <div style="font-size:14px;font-weight:800;color:white;line-height:1.4;">Cada entrega tardía es una venta que <span style="color:var(--red);">no vuelve.</span></div>
+        <div style="font-size:11px;color:hsl(212 60% 60%);margin-top:5px;">Con Picker: 45 min + WhatsApp en tiempo real</div>
+      </div>
+      <div style="width:1px;height:60px;background:hsl(0 0% 100%/.12);"></div>
+      <div style="text-align:center;padding:0 20px;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:hsl(162 80% 55%);margin-bottom:6px;">Lo que cambia la recompra</div>
+        <div style="font-size:48px;font-weight:900;color:hsl(162 80% 65%);line-height:1;">70%</div>
+        <div style="font-size:11px;color:hsl(212 60% 65%);margin-top:4px;">de los que reciben a tiempo <strong style="color:white;">recompran</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 4 · CÓMO FUNCIONA (flow + módulos) ═══ -->
+<div class="slide">
+  <div class="content" style="display:flex;flex-direction:column;gap:14px;">
+    <div>
+      <div class="tag">Cómo funciona</div>
+      <h2>Picker orquesta cada pedido de Klyns al carrier correcto, automáticamente.</h2>
+    </div>
+    <!-- FLUJO VISUAL -->
+    <div style="display:flex;align-items:stretch;gap:0;width:100%;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+      <!-- PASO 1 -->
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 12px;border-right:1px solid var(--border);">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--celeste-dim);border:1.5px solid var(--celeste-mid);display:flex;align-items:center;justify-content:center;font-size:26px;">📱</div>
+        <div style="font-weight:800;font-size:13px;text-align:center;">Pedido entra</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 10px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:var(--sub);">VTEX</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 10px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:var(--sub);">Call Center</div>
+        </div>
+      </div>
+      <!-- FLECHA -->
+      <div style="display:flex;align-items:center;padding:0 6px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(214 33% 78%)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <!-- PASO 2 PICKER -->
+      <div style="flex:1.8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 14px;background:var(--celeste-dim);border-right:1px solid var(--celeste-mid);">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--celeste);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 14px hsl(193 100% 45%/.3);">⚡</div>
+        <div style="font-weight:900;font-size:14px;color:var(--celeste);text-align:center;">Picker + Flows</div>
+        <div style="display:flex;flex-direction:column;gap:4px;width:100%;">
+          <div style="background:white;border:2px solid var(--celeste-mid);border-radius:7px;padding:5px 10px;font-size:10px;color:var(--sub);text-align:center;"><span style="font-weight:800;color:var(--celeste);">✓ Online / prepagado</span> → carrier más cercano</div>
+          <div style="background:hsl(214 33% 97%);border:1px dashed var(--border);border-radius:7px;padding:4px 10px;font-size:10px;color:var(--muted);text-align:center;">Efectivo + transferencias → proveedor actual · sin cambios</div>
+        </div>
+        <div style="background:var(--celeste);color:white;border-radius:6px;padding:3px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;">Solo pedidos ya pagados en línea</div>
+      </div>
+      <!-- FLECHA -->
+      <div style="display:flex;align-items:center;padding:0 6px;background:var(--celeste-dim);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(193 60% 60%)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <!-- PASO 3 CARRIERS -->
+      <div style="flex:1.3;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 12px;border-right:1px solid var(--border);">
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px;">Carrier asignado</div>
+        <div style="background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:9px;padding:8px 11px;">
+          <div style="font-size:11px;font-weight:800;color:var(--green-text);">🛵 Uber / Rapicargo</div>
+          <div style="font-size:10px;color:var(--sub);">Efectivo · inmediato</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:8px 11px;">
+          <div style="font-size:11px;font-weight:700;color:var(--sub);">⚡ Lalamove · MU · PBox</div>
+          <div style="font-size:10px;color:var(--muted);">Digital · precio bajo</div>
+        </div>
+        <div style="background:var(--amber-bg);border:1px solid hsl(43 100% 45%/.3);border-radius:9px;padding:8px 11px;">
+          <div style="font-size:11px;font-weight:700;color:var(--amber);">🔄 Proveedor actual</div>
+          <div style="font-size:10px;color:var(--sub);">Transferencias · ticket alto</div>
+        </div>
+      </div>
+      <!-- FLECHA -->
+      <div style="display:flex;align-items:center;padding:0 6px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(214 33% 78%)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <!-- PASO 4 ENTREGADO -->
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 12px;">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--green-dim);border:1.5px solid var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:26px;">✅</div>
+        <div style="font-weight:800;font-size:13px;text-align:center;">Entregado</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 10px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:var(--sub);">Tracking Klyns</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 10px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:var(--sub);">WhatsApp cliente</div>
+        </div>
+      </div>
+    </div>
+    <!-- MÓDULOS DETALLE -->
+    <div class="grid3" style="gap:10px;">
+      <!-- Orquestador -->
+      <div class="card-sm">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--celeste);margin-bottom:8px;">① Orquestador</div>
+        <div class="row-list">
+          <div class="row-item"><div class="row-dot"></div><span>5 carriers en simultáneo — rider más cercano disponible</span></div>
+          <div class="row-item"><div class="row-dot"></div><span>Asignación 100% automática — sin llamadas manuales al proveedor</span></div>
+          <div class="row-item"><div class="row-dot"></div><span>Dashboard único: riders del proveedor + 5 carriers en un panel</span></div>
+          <div class="row-item"><div class="row-dot"></div><span>Tarifas preferenciales pactadas a nivel Latam</span></div>
+        </div>
+      </div>
+      <!-- Flows -->
+      <div class="card-sm" style="border:2px solid var(--celeste-mid);background:var(--celeste-dim);">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--celeste);margin-bottom:8px;">② Flows — reglas configuradas para Klyns</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:white;border:2px solid var(--celeste-mid);border-radius:8px;padding:9px 12px;">
+            <div class="rule-label" style="color:var(--celeste);">✓ Regla activa · Canal VTEX (online / prepagado)</div>
+            <div style="font-size:11.5px;color:var(--text);font-weight:600;margin-top:2px;">Picker orquesta al carrier más cercano disponible → entrega directa sin efectivo</div>
+          </div>
+          <div style="background:hsl(214 33% 97%);border:1px dashed var(--border);border-radius:8px;padding:9px 12px;">
+            <div class="rule-label">Sin cambio · Efectivo + transferencias inter-sucursal</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Sigue con tu proveedor actual · Picker no interviene en ese flujo</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;background:var(--celeste);border-radius:7px;padding:6px 10px;text-align:center;font-size:10px;font-weight:800;color:white;letter-spacing:.04em;">Arranque limpio · Solo donde Picker suma valor inmediato</div>
+      </div>
+      <!-- VTEX + Tracking + Seguro -->
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="card-sm">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--celeste);margin-bottom:6px;">③ Integración VTEX</div>
+          <div class="row-list">
+            <div class="row-item"><div class="row-dot"></div><span>Pedidos web entran al orquestador sin intervención CC</span></div>
+            <div class="row-item"><div class="row-dot"></div><span>Flows aplican en tiempo real · ~2–3 semanas de integración</span></div>
+          </div>
+        </div>
+        <div class="card-sm">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--celeste);margin-bottom:6px;">④ Tracking + Notificaciones</div>
+          <div class="row-list">
+            <div class="row-item"><div class="row-dot"></div><span>Cliente final: link de tracking en tiempo real + ETA</span></div>
+            <div class="row-item"><div class="row-dot"></div><span><strong>WhatsApp brandeado Klyns</strong>: confirmación, salida y entrega</span></div>
+            <div class="row-item"><div class="row-dot"></div><span>Datos e historial 100% de Klyns — no del proveedor</span></div>
+          </div>
+        </div>
+        <div class="card-sm">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--celeste);margin-bottom:6px;">⑤ Seguro + Incidencias</div>
+          <div class="row-list">
+            <div class="row-item"><div class="row-dot"></div><span>Escala en plataforma: foto, video, nota de voz</span></div>
+            <div class="row-item"><div class="row-dot a"></div><span>Seguro opcional: <strong>100% hasta $100 USD</strong> (~$1,800 MXN)/envío</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 5 · QUÉ PUEDE / NO PUEDE ═══ -->
+<div class="slide">
+  <div class="content" style="display:flex;flex-direction:column;gap:16px;">
+    <div>
+      <div class="tag blue">Modelo de convivencia</div>
+      <h2>Picker para lo digital · tu proveedor<br/>para lo que ya hace bien.</h2>
+    </div>
+    <!-- SÍ PUEDE — GRID VISUAL -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;">
+      <div style="background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:12px;padding:14px 14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:22px;">🛵</div>
+        <div style="font-size:13px;font-weight:800;color:var(--text);line-height:1.2;">900–1,500 pedidos VTEX</div>
+        <div style="font-size:11px;color:var(--sub);">Canal digital · 5 carriers simultáneos</div>
+      </div>
+      <div style="background:hsl(214 33% 97%);border:1.5px dashed var(--border);border-radius:12px;padding:14px 14px;display:flex;flex-direction:column;gap:6px;opacity:.7;">
+        <div style="font-size:22px;">💵</div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted);line-height:1.2;">Efectivo en entrega</div>
+        <div style="font-size:11px;color:var(--muted);">Sigue con proveedor actual · no entra al piloto</div>
+      </div>
+      <div style="background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:12px;padding:14px 14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:22px;">📍</div>
+        <div style="font-size:13px;font-weight:800;color:var(--text);line-height:1.2;">Tracking en tiempo real</div>
+        <div style="font-size:11px;color:var(--sub);">WhatsApp brandeado Klyns · datos propios</div>
+      </div>
+      <div style="background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:12px;padding:14px 14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:22px;">🔗</div>
+        <div style="font-size:13px;font-weight:800;color:var(--text);line-height:1.2;">Integración VTEX</div>
+        <div style="font-size:11px;color:var(--sub);">Pedidos web → orquestador automático</div>
+      </div>
+      <div style="background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:12px;padding:14px 14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:22px;">⚙️</div>
+        <div style="font-size:13px;font-weight:800;color:var(--text);line-height:1.2;">Flows por regla</div>
+        <div style="font-size:11px;color:var(--sub);">Efectivo, ticket alto, zona — sin manual</div>
+      </div>
+      <div style="background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:12px;padding:14px 14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:22px;">📊</div>
+        <div style="font-size:13px;font-weight:800;color:var(--text);line-height:1.2;">Dashboard propio</div>
+        <div style="font-size:11px;color:var(--sub);">18 riders + carriers · un solo panel</div>
+      </div>
+      <div style="background:var(--red-bg);border:1.5px solid hsl(346 100% 45%/.25);border-radius:12px;padding:14px 14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:22px;">✗</div>
+        <div style="font-size:13px;font-weight:800;color:var(--red);line-height:1.2;">Transferencias multi-parada</div>
+        <div style="font-size:11px;color:var(--sub);">14-16% con parada inter-sucursal → proveedor actual</div>
+      </div>
+      <div style="background:var(--red-bg);border:1.5px solid hsl(346 100% 45%/.25);border-radius:12px;padding:14px 14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:22px;">✗</div>
+        <div style="font-size:13px;font-weight:800;color:var(--red);line-height:1.2;">Seguro &gt;$1,800 MXN</div>
+        <div style="font-size:11px;color:var(--sub);">Tickets altos → Flows los manda al proveedor</div>
+      </div>
+    </div>
+    <!-- MODELO RECOMENDADO — PROMINENTE -->
+    <div style="background:var(--text);border-radius:16px;padding:18px 24px;display:flex;gap:0;align-items:stretch;">
+      <div style="flex:1;border-right:1px solid hsl(0 0% 100%/.15);padding-right:24px;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--celeste);margin-bottom:10px;">Canal Picker · VTEX</div>
+        <div style="font-size:28px;font-weight:900;color:white;margin-bottom:4px;">900–1,500 pedidos</div>
+        <div style="font-size:13px;color:hsl(212 100% 80%);margin-bottom:8px;">Canal digital · costo variable · sin iguala</div>
+        <div style="font-size:12px;color:hsl(212 100% 70%);">Tracking + WhatsApp · datos propios · integración VTEX nativa</div>
+      </div>
+      <div style="flex:1;padding:0 24px;border-right:1px solid hsl(0 0% 100%/.15);">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Tu proveedor actual · sin cambios</div>
+        <div style="font-size:28px;font-weight:900;color:hsl(0 0% 60%);margin-bottom:4px;">Todo lo demás</div>
+        <div style="font-size:13px;color:hsl(0 0% 50%);margin-bottom:8px;">CC + inter-sucursal + valija + mensajería</div>
+        <div style="font-size:12px;color:hsl(0 0% 45%);">Picker no compite con él · Klyns decide el ritmo</div>
+      </div>
+      <div style="flex:1;padding-left:24px;display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--celeste);margin-bottom:8px;">Resultado esperado</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:4px;">Sin fricción operativa</div>
+        <div style="font-size:12px;color:hsl(212 100% 75%);line-height:1.5;">Picker arranca en paralelo · el proveedor no se entera · piloto 2–3 semanas con pedidos VTEX reales.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 6 · VALOR AGREGADO ═══ -->
+<div class="slide">
+  <div class="content" style="display:flex;flex-direction:column;gap:12px;">
+    <div>
+      <div class="tag blue">Por qué Picker en tu canal online</div>
+      <h2>Entregar más rápido no es solo operativo.<br/><span style="color:var(--celeste);">Es tu ventaja vs la competencia.</span></h2>
+    </div>
+
+    <!-- HERO: 70% + tiempos -->
+    <div style="background:var(--text);border-radius:16px;padding:20px 28px;display:grid;grid-template-columns:1fr 1px 1fr;gap:0;align-items:center;">
+      <!-- LEFT: 70% -->
+      <div style="display:flex;align-items:center;gap:24px;padding-right:28px;">
+        <div style="flex-shrink:0;text-align:center;">
+          <div style="font-size:72px;font-weight:900;color:hsl(162 80% 65%);line-height:1;">70%</div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:hsl(162 60% 50%);margin-top:3px;">de recompra</div>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:white;line-height:1.3;margin-bottom:6px;">de los clientes que reciben a tiempo <span style="color:hsl(162 80% 65%);">vuelven a comprar.</span></div>
+          <div style="font-size:11.5px;color:hsl(212 50% 65%);line-height:1.55;">Si tu competencia entrega en 60 min y Klyns entrega en 45, ese cliente va a pedirte a ti la siguiente vez — sin que tengas que hacer nada más.</div>
+        </div>
+      </div>
+      <div style="width:1px;height:80px;background:hsl(0 0% 100%/.12);"></div>
+      <!-- RIGHT: tiempos -->
+      <div style="padding-left:28px;display:flex;align-items:center;gap:20px;">
+        <div style="text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:hsl(346 100% 60%);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Hoy</div>
+          <div style="font-size:52px;font-weight:900;color:hsl(346 100% 60%);line-height:1;">~60</div>
+          <div style="font-size:11px;color:hsl(212 50% 55%);">min</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="font-size:24px;color:var(--celeste);">→</div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--celeste);text-align:center;">Con Picker</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:hsl(162 80% 55%);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Con Picker</div>
+          <div style="font-size:52px;font-weight:900;color:hsl(162 80% 65%);line-height:1;">45</div>
+          <div style="font-size:11px;color:hsl(212 50% 55%);">min</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:11.5px;color:hsl(212 50% 65%);line-height:1.55;">Más carriers disponibles = repartidor más cercano acepta primero. La distancia de Klyns (0–5 km) hace que este impacto sea inmediato.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 CARDS DE VALOR -->
+    <div class="grid3" style="gap:10px;">
+      <div class="card" style="border-top:3px solid var(--green);display:flex;flex-direction:column;gap:8px;padding:16px 18px;">
+        <div style="font-size:24px;">📱</div>
+        <div style="font-weight:800;font-size:13px;line-height:1.2;">Experiencia post-compra para tu cliente VTEX</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+          <div class="check-row"><div class="check-ok">✓</div><span style="font-size:11px;">WhatsApp brandeado Klyns · confirmación + salida + entrega</span></div>
+          <div class="check-row"><div class="check-ok">✓</div><span style="font-size:11px;">Tracking en tiempo real para el cliente final</span></div>
+          <div class="check-row"><div class="check-ok">✓</div><span style="font-size:11px;">ETA preciso · menos "¿dónde está mi pedido?" al CC</span></div>
+        </div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--celeste);display:flex;flex-direction:column;gap:8px;padding:16px 18px;">
+        <div style="font-size:24px;">📈</div>
+        <div style="font-weight:800;font-size:13px;line-height:1.2;">VTEX crece sin subir la iguala</div>
+        <p class="sub" style="font-size:11px;line-height:1.6;">Hoy tienes 1,500 pedidos online. Cuando llegues a 3,000, el proveedor pedirá más motos — y la iguala sube. Con Picker, el crecimiento digital es 100% variable.</p>
+        <div style="background:var(--celeste-dim);border:1px solid var(--celeste-mid);border-radius:8px;padding:8px 12px;margin-top:auto;">
+          <div style="display:flex;justify-content:space-around;align-items:center;gap:8px;">
+            <div style="text-align:center;"><div style="font-size:22px;font-weight:900;color:var(--sub);">1,500</div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;">VTEX hoy</div></div>
+            <div style="font-size:18px;color:var(--celeste);">→</div>
+            <div style="text-align:center;"><div style="font-size:22px;font-weight:900;color:var(--celeste);">3,000+</div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;">sin subir iguala</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--amber);display:flex;flex-direction:column;gap:8px;padding:16px 18px;">
+        <div style="font-size:24px;">📊</div>
+        <div style="font-weight:800;font-size:13px;line-height:1.2;">Datos propios para renegociar</div>
+        <p class="sub" style="font-size:11px;line-height:1.6;">Hoy los datos de cada entrega viven en GEDI. Con Picker, Klyns acumula su propio historial: SLA real, costo por km y zona — el argumento que falta para renegociar cuando venza el contrato.</p>
+        <div style="background:var(--amber-bg);border:1px solid hsl(43 100% 45%/.3);border-radius:8px;padding:8px 12px;margin-top:auto;font-size:10px;color:hsl(43 100% 28%);font-weight:700;">3 meses de datos = palanca real para bajar la iguala</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 7 · PRECIO ═══ -->
+<div class="slide">
+  <div class="content" style="display:flex;flex-direction:column;gap:12px;">
+    <div>
+      <div class="tag blue">Precio Picker</div>
+      <h2>Transparente. Sin iguala. Sin sorpresas.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;">
+      <!-- LEFT: TARIFARIO COMPACTO + INTEGRACIÓN -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:7px 14px;background:var(--text);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:white;">Moto — MXN</span>
+            <span style="font-size:9px;color:hsl(193 100% 75%);">◆ efectivo · ★ mejor tarifa</span>
+          </div>
+          <table class="tbl">
+            <thead>
+              <tr style="background:var(--bg);">
+                <th style="width:66px;font-size:9px;padding:6px 8px;">Dist.</th>
+                <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">UBER ◆★</th>
+                <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">RAPPI ◆★</th>
+                <th class="r" style="font-size:9px;padding:6px 8px;">LALAMOVE</th>
+                <th class="r" style="font-size:9px;padding:6px 8px;">MU</th>
+                <th class="r" style="font-size:9px;padding:6px 8px;">PBOX</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">0–3 km</td><td class="r g" style="font-size:11px;padding:6px 8px;">$52</td><td class="r g" style="font-size:11px;padding:6px 8px;">$54</td><td class="r" style="font-size:11px;padding:6px 8px;">$60</td><td class="r" style="font-size:11px;padding:6px 8px;">$86</td><td class="r" style="font-size:11px;padding:6px 8px;">$50</td></tr>
+              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">5 km</td><td class="r" style="font-size:11px;padding:6px 8px;">$63</td><td class="r" style="font-size:11px;padding:6px 8px;">$77.70</td><td class="r" style="font-size:11px;padding:6px 8px;">$81.90</td><td class="r" style="font-size:11px;padding:6px 8px;">$114.30</td><td class="r" style="font-size:11px;padding:6px 8px;">$79.80</td></tr>
+              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">7 km</td><td class="r" style="font-size:11px;padding:6px 8px;">$71.40</td><td class="r" style="font-size:11px;padding:6px 8px;">$98.70</td><td class="r" style="font-size:11px;padding:6px 8px;">$100.80</td><td class="r" style="font-size:11px;padding:6px 8px;">$138.30</td><td class="r" style="font-size:11px;padding:6px 8px;">$107.10</td></tr>
+              <tr><td style="font-size:9px;color:var(--muted);padding:5px 8px;">km extra</td><td class="r dim" style="padding:5px 8px;">$4.20</td><td class="r dim" style="padding:5px 8px;">$10.50</td><td class="r dim" style="padding:5px 8px;">$9.45</td><td class="r dim" style="padding:5px 8px;">$12</td><td class="r dim" style="padding:5px 8px;">$13.65</td></tr>
+            </tbody>
+          </table>
+          <div style="padding:6px 14px;background:var(--text);border-top:1px solid hsl(229 50% 25%);">
+            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:white;">Auto — MXN</span>
+          </div>
+          <table class="tbl">
+            <thead>
+              <tr style="background:var(--bg);">
+                <th style="width:66px;font-size:9px;padding:6px 8px;">Dist.</th>
+                <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">UBER ◆</th>
+                <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">RAPPI</th>
+                <th class="r" style="font-size:9px;padding:6px 8px;">LALAMOVE</th>
+                <th class="r" style="color:var(--muted);font-size:9px;padding:6px 8px;">MU</th>
+                <th class="r" style="color:var(--muted);font-size:9px;padding:6px 8px;">PBOX</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">0–3 km</td><td class="r g" style="font-size:11px;padding:6px 8px;">$75</td><td class="r g" style="font-size:11px;padding:6px 8px;">$99.90</td><td class="r" style="font-size:11px;padding:6px 8px;">$75</td><td class="r dim" style="padding:6px 8px;">—</td><td class="r dim" style="padding:6px 8px;">—</td></tr>
+              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">10 km</td><td class="r" style="font-size:11px;padding:6px 8px;">$108.15</td><td class="r" style="font-size:11px;padding:6px 8px;">$240.87</td><td class="r" style="font-size:11px;padding:6px 8px;">$152.25</td><td class="r dim" style="padding:6px 8px;">—</td><td class="r dim" style="padding:6px 8px;">—</td></tr>
+              <tr><td style="font-size:9px;color:var(--muted);padding:5px 8px;">km extra</td><td class="r dim" style="padding:5px 8px;">$4.20</td><td class="r dim" style="padding:5px 8px;">$19.43</td><td class="r dim" style="padding:5px 8px;">$10.50</td><td class="r dim" style="padding:5px 8px;">—</td><td class="r dim" style="padding:5px 8px;">—</td></tr>
+            </tbody>
+          </table>
+          <div style="padding:6px 14px;background:var(--bg);font-size:9px;color:var(--muted);">◆ recaudo efectivo disponible · ★ tarifa más baja con recaudo · Todos los precios en MXN</div>
+        </div>
+        <!-- INTEGRACIÓN PROMO -->
+        <div style="background:var(--celeste-dim);border:2px solid var(--celeste-mid);border-radius:12px;padding:11px 16px;display:flex;align-items:center;gap:13px;">
+          <div style="font-size:24px;line-height:1;flex-shrink:0;">🚀</div>
+          <div>
+            <div style="font-size:12px;font-weight:800;color:var(--celeste);margin-bottom:2px;">Integración sin costo</div>
+            <div style="font-size:11px;color:var(--sub);">Si se activa en los primeros <strong style="color:var(--text);">30 días</strong> · VTEX nativa disponible</div>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT: ¿QUÉ PAGAS? + EJEMPLO+COMPARATIVO UNIFICADO -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <!-- LO QUE PAGAS -->
+        <div class="card" style="padding:16px 20px;">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;">¿Qué pagas con Picker?</div>
+          <div style="background:var(--bg);border-radius:12px;padding:14px 10px;display:flex;align-items:center;justify-content:space-around;margin-bottom:12px;">
+            <div style="text-align:center;">
+              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Tarifa carrier</div>
+              <div style="font-size:22px;font-weight:900;color:var(--text);">$52–114</div>
+              <div style="font-size:8px;color:var(--sub);">según km · moto</div>
+            </div>
+            <div style="font-size:24px;color:var(--border);font-weight:200;">+</div>
+            <div style="text-align:center;">
+              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Fee Picker</div>
+              <div style="font-size:30px;font-weight:900;color:var(--celeste);">$7</div>
+              <div style="font-size:8px;color:var(--sub);">MXN + IVA / envío</div>
+            </div>
+            <div style="font-size:24px;color:var(--border);font-weight:200;">=</div>
+            <div style="text-align:center;">
+              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Tu costo por envío</div>
+              <div style="font-size:30px;font-weight:900;color:var(--green-text);">$68–85</div>
+              <div style="font-size:8px;color:var(--sub);">MXN / envío · sin iguala fija mensual</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;text-align:center;background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:10px;padding:10px 8px;">
+              <div style="font-size:8px;color:var(--green-text);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Iguala fija</div>
+              <div style="font-size:26px;font-weight:900;color:var(--green-text);">$0</div>
+              <div style="font-size:8px;color:var(--sub);">Solo pagas lo que usas</div>
+            </div>
+            <div style="flex:1;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 8px;">
+              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Fee por local/mes</div>
+              <div style="font-size:20px;font-weight:700;color:var(--muted);text-decoration:line-through;">$1,000</div>
+              <div style="font-size:9px;color:var(--green-text);font-weight:800;">✓ Eliminado para Klyns</div>
+            </div>
+          </div>
+        </div>
+        <!-- ZERO COMMITMENT HERO -->
+        <div style="background:var(--text);border-radius:14px;padding:16px 20px;display:grid;grid-template-columns:auto 1px 1fr;align-items:center;gap:0;">
+          <!-- BIG $0 -->
+          <div style="padding-right:20px;text-align:center;">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:hsl(162 80% 60%);margin-bottom:6px;">Si no usas Picker</div>
+            <div style="font-size:64px;font-weight:900;color:hsl(162 80% 65%);line-height:1;">$0</div>
+            <div style="font-size:8px;color:hsl(212 50% 55%);margin-top:3px;font-weight:600;">pagas exactamente eso</div>
+          </div>
+          <div style="width:1px;height:70px;background:hsl(0 0% 100%/.12);"></div>
+          <!-- COMMITMENT LIST -->
+          <div style="padding-left:20px;display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:hsl(162 80% 65%/.15);border:1px solid hsl(162 80% 65%/.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:hsl(162 80% 65%);font-weight:900;">✓</div>
+              <span style="font-size:11px;color:white;font-weight:600;">Sin iguala mensual</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:hsl(162 80% 65%/.15);border:1px solid hsl(162 80% 65%/.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:hsl(162 80% 65%);font-weight:900;">✓</div>
+              <span style="font-size:11px;color:white;font-weight:600;">Sin fee por local</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:hsl(162 80% 65%/.15);border:1px solid hsl(162 80% 65%/.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:hsl(162 80% 65%);font-weight:900;">✓</div>
+              <span style="font-size:11px;color:white;font-weight:600;">Sin mínimo de pedidos</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:hsl(162 80% 65%/.15);border:1px solid hsl(162 80% 65%/.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:hsl(162 80% 65%);font-weight:900;">✓</div>
+              <span style="font-size:11px;color:white;font-weight:600;">Sin plazo forzoso</span>
+            </div>
+          </div>
+        </div>
+        <!-- VTEX CHANNEL ESTIMATE -->
+        <div class="card" style="padding:14px 18px;">
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Estimado canal online (pedidos ya pagados en línea)</div>
+          <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;margin-bottom:10px;">
+            <div>
+              <div style="font-size:18px;font-weight:900;color:var(--text);">1,500</div>
+              <div style="font-size:8px;color:var(--muted);font-weight:600;">pedidos VTEX/mes</div>
+            </div>
+            <div style="font-size:14px;color:var(--border);">×</div>
+            <div>
+              <div style="font-size:18px;font-weight:900;color:var(--text);">~$68</div>
+              <div style="font-size:8px;color:var(--muted);font-weight:600;">carrier + Picker</div>
+            </div>
+            <div style="font-size:14px;color:var(--border);">=</div>
+            <div style="background:var(--celeste-dim);border:1.5px solid var(--celeste-mid);border-radius:10px;padding:8px 6px;">
+              <div style="font-size:20px;font-weight:900;color:var(--celeste);">~$102K</div>
+              <div style="font-size:8px;color:var(--sub);font-weight:600;">MXN / mes · 100% variable</div>
+            </div>
+          </div>
+          <div style="background:var(--green-dim);border:1px solid var(--green-mid);border-radius:8px;padding:8px 12px;font-size:10.5px;color:var(--green-text);font-weight:700;text-align:center;">
+            Si un mes no usas Picker → pagas $0. Sin preguntas.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 8 · PRÓXIMOS PASOS ═══ -->
+<div class="slide">
+  <div class="content" style="display:flex;flex-direction:column;gap:14px;">
+    <div>
+      <div class="tag blue">Próximos pasos</div>
+      <h2>Sin presión.<br/><span style="color:var(--celeste);">Con datos reales.</span></h2>
+    </div>
+
+    <!-- TIMELINE HORIZONTAL -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:start;">
+
+      <!-- PASO 1 -->
+      <div class="card" style="border-top:3px solid var(--celeste);display:flex;flex-direction:column;gap:7px;padding:14px 16px;">
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--celeste);">Hoy</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--celeste-dim);border:2px solid var(--celeste);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--celeste);flex-shrink:0;">1</div>
+          <div style="font-size:12px;font-weight:800;line-height:1.2;">Picker envía documentación</div>
+        </div>
+        <div class="sub" style="font-size:10.5px;line-height:1.6;">Propuesta + especificaciones técnicas de integración VTEX para revisión del equipo Klyns.</div>
+        <div style="background:var(--celeste-dim);border-radius:6px;padding:6px 10px;font-size:10px;font-weight:700;color:var(--celeste);margin-top:auto;">📩 Picker → Klyns</div>
+      </div>
+
+      <!-- PASO 2 -->
+      <div class="card" style="border-top:3px solid var(--amber);display:flex;flex-direction:column;gap:7px;padding:14px 16px;">
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);">Esta semana</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--amber-bg);border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--amber);flex-shrink:0;">2</div>
+          <div style="font-size:12px;font-weight:800;line-height:1.2;">Klyns comparte con Revolución</div>
+        </div>
+        <div class="sub" style="font-size:10.5px;line-height:1.6;">El equipo técnico de Revolución (proveedor VTEX) evalúa viabilidad de la integración.</div>
+        <div style="background:var(--amber-bg);border-radius:6px;padding:6px 10px;font-size:10px;font-weight:700;color:hsl(43 100% 30%);margin-top:auto;">⚙️ Evaluación técnica</div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div class="card" style="border-top:3px solid var(--green);display:flex;flex-direction:column;gap:7px;padding:14px 16px;">
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--green-text);">29–30 junio</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--green-dim);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--green-text);flex-shrink:0;">3</div>
+          <div style="font-size:12px;font-weight:800;line-height:1.2;">Follow-up y alineación</div>
+        </div>
+        <div class="sub" style="font-size:10.5px;line-height:1.6;">Check rápido: ¿qué necesita Revolución? ¿Hay objeciones técnicas? Confirmar arranque julio.</div>
+        <div style="background:var(--green-dim);border-radius:6px;padding:6px 10px;font-size:10px;font-weight:700;color:var(--green-text);margin-top:auto;">📞 Picker + Klyns</div>
+      </div>
+
+      <!-- PASO 4 -->
+      <div class="card" style="border-top:3px solid hsl(271 76% 60%);display:flex;flex-direction:column;gap:7px;padding:14px 16px;">
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:hsl(271 76% 52%);">Julio</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:hsl(271 76% 60%/.15);border:2px solid hsl(271 76% 60%);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:hsl(271 76% 52%);flex-shrink:0;">4</div>
+          <div style="font-size:12px;font-weight:800;line-height:1.2;">Mes de prueba informal</div>
+        </div>
+        <div class="sub" style="font-size:10.5px;line-height:1.6;">Canal online de Klyns corre con Picker. Sin cambiar nada más. Solo pedidos ya pagados en línea.</div>
+        <div style="background:hsl(271 76% 60%/.12);border-radius:6px;padding:6px 10px;font-size:10px;font-weight:700;color:hsl(271 76% 40%);margin-top:auto;">🚀 Sin compromiso formal</div>
+      </div>
+
+      <!-- PASO 5 -->
+      <div style="background:var(--text);border-radius:14px;border-top:3px solid hsl(162 80% 55%);display:flex;flex-direction:column;gap:7px;padding:14px 16px;">
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:hsl(162 80% 60%);">Agosto</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:hsl(162 80% 60%/.2);border:2px solid hsl(162 80% 55%);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:hsl(162 80% 60%);flex-shrink:0;">5</div>
+          <div style="font-size:12px;font-weight:800;line-height:1.2;color:white;">Evaluación y decisión de escala</div>
+        </div>
+        <div style="font-size:10.5px;line-height:1.6;color:hsl(212 50% 65%);">Datos reales: SLA, costo/envío, recompra. Klyns decide si escala a todos los nodos.</div>
+        <div style="background:hsl(162 80% 60%/.15);border-radius:6px;padding:6px 10px;font-size:10px;font-weight:700;color:hsl(162 80% 60%);margin-top:auto;">📊 Con números encima de la mesa</div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM REMINDER -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:28px;line-height:1;flex-shrink:0;">✅</div>
+        <div>
+          <div style="font-size:11.5px;font-weight:800;color:var(--green-text);margin-bottom:3px;">Cero compromiso durante la prueba</div>
+          <div style="font-size:11px;color:var(--sub);">Si julio no funciona como esperaban — Klyns no firma nada, no paga nada adicional. Así de simple.</div>
+        </div>
+      </div>
+      <div class="card-celeste" style="padding:12px 18px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:28px;line-height:1;flex-shrink:0;">📱</div>
+        <div>
+          <div style="font-size:11.5px;font-weight:800;color:var(--celeste);margin-bottom:3px;">Integración VTEX nativa</div>
+          <div style="font-size:11px;color:var(--sub);">Picker ya tiene conector VTEX. El setup técnico no depende de Klyns — solo de la revisión de Revolución.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #deck -->
+
+<div id="slide-num">1 / 8</div>
+<div id="nav">
+  <button class="nav-btn" id="prev" onclick="move(-1)" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div id="indicators"></div>
+  <button class="nav-btn" id="next" onclick="move(1)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</div>
+<script>
+  const slides = document.querySelectorAll('.slide'), total = slides.length; let cur = 0;
+  const iw = document.getElementById('indicators');
+  slides.forEach((_,i) => { const d = document.createElement('div'); d.className='dot'+(i===0?' on':''); d.onclick=()=>go(i); iw.appendChild(d); });
+  function go(n) { slides[cur].classList.remove('active'); slides[cur].classList.add('exit'); setTimeout(()=>slides[cur].classList.remove('exit'),420); cur=n; slides[cur].classList.add('active'); document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===cur)); document.getElementById('slide-num').textContent=`${cur+1} / ${total}`; document.getElementById('prev').disabled=cur===0; document.getElementById('next').disabled=cur===total-1; }
+  function move(d) { if(cur+d>=0&&cur+d<total) go(cur+d); }
+  document.addEventListener('keydown',e=>{ if(e.key==='ArrowRight'||e.key==='ArrowDown') move(1); if(e.key==='ArrowLeft'||e.key==='ArrowUp') move(-1); });
+</script>
+</body>
+</html>
