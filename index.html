@@ -497,109 +497,133 @@
       <h2>Transparente. Sin iguala. Sin sorpresas.</h2>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;">
-      <!-- LEFT: TARIFARIO COMPACTO + INTEGRACIÓN -->
+
+      <!-- LEFT: TARIFARIO SIMPLIFICADO KLYNS -->
       <div style="display:flex;flex-direction:column;gap:10px;">
+        <!-- FÓRMULA PRECIO -->
+        <div class="card" style="padding:14px 18px;">
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">¿Qué pagas por envío?</div>
+          <div style="background:var(--bg);border-radius:10px;padding:12px 10px;display:flex;align-items:center;justify-content:space-around;">
+            <div style="text-align:center;">
+              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Carrier</div>
+              <div style="font-size:22px;font-weight:900;color:var(--text);">$52+</div>
+              <div style="font-size:8px;color:var(--sub);">según km</div>
+            </div>
+            <div style="font-size:22px;color:var(--border);font-weight:200;">+</div>
+            <div style="text-align:center;">
+              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Fee Picker</div>
+              <div style="font-size:28px;font-weight:900;color:var(--celeste);">$7</div>
+              <div style="font-size:8px;color:var(--sub);">MXN</div>
+            </div>
+            <div style="font-size:22px;color:var(--border);font-weight:200;">+</div>
+            <div style="text-align:center;">
+              <div style="font-size:8px;color:var(--amber);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">IVA 16%</div>
+              <div style="font-size:28px;font-weight:900;color:var(--amber);">+16%</div>
+              <div style="font-size:8px;color:var(--sub);">sobre total</div>
+            </div>
+            <div style="font-size:22px;color:var(--border);font-weight:200;">=</div>
+            <div style="text-align:center;background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:10px;padding:8px 10px;">
+              <div style="font-size:8px;color:var(--green-text);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Total c/IVA</div>
+              <div style="font-size:24px;font-weight:900;color:var(--green-text);">$68+</div>
+              <div style="font-size:8px;color:var(--sub);">MXN / envío</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLA MOTO — SOLO CARRIERS KLYNS -->
         <div class="card" style="padding:0;overflow:hidden;">
-          <div style="padding:7px 14px;background:var(--text);display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:white;">Moto — MXN</span>
-            <span style="font-size:9px;color:hsl(193 100% 75%);">◆ efectivo · ★ mejor tarifa</span>
+          <div style="padding:8px 14px;background:var(--text);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:white;">Moto · Pedidos VTEX (prepagados) — MXN</span>
+            <span style="font-size:9px;color:hsl(162 80% 65%);font-weight:700;">IVA incluido en "Total"</span>
           </div>
           <table class="tbl">
             <thead>
               <tr style="background:var(--bg);">
-                <th style="width:66px;font-size:9px;padding:6px 8px;">Dist.</th>
-                <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">UBER ◆★</th>
-                <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">RAPPI ◆★</th>
-                <th class="r" style="font-size:9px;padding:6px 8px;">LALAMOVE</th>
-                <th class="r" style="font-size:9px;padding:6px 8px;">MU</th>
-                <th class="r" style="font-size:9px;padding:6px 8px;">PBOX</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">0–3 km</td><td class="r g" style="font-size:11px;padding:6px 8px;">$52</td><td class="r g" style="font-size:11px;padding:6px 8px;">$54</td><td class="r" style="font-size:11px;padding:6px 8px;">$60</td><td class="r" style="font-size:11px;padding:6px 8px;">$86</td><td class="r" style="font-size:11px;padding:6px 8px;">$50</td></tr>
-              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">5 km</td><td class="r" style="font-size:11px;padding:6px 8px;">$63</td><td class="r" style="font-size:11px;padding:6px 8px;">$77.70</td><td class="r" style="font-size:11px;padding:6px 8px;">$81.90</td><td class="r" style="font-size:11px;padding:6px 8px;">$114.30</td><td class="r" style="font-size:11px;padding:6px 8px;">$79.80</td></tr>
-              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">7 km</td><td class="r" style="font-size:11px;padding:6px 8px;">$71.40</td><td class="r" style="font-size:11px;padding:6px 8px;">$98.70</td><td class="r" style="font-size:11px;padding:6px 8px;">$100.80</td><td class="r" style="font-size:11px;padding:6px 8px;">$138.30</td><td class="r" style="font-size:11px;padding:6px 8px;">$107.10</td></tr>
-              <tr><td style="font-size:9px;color:var(--muted);padding:5px 8px;">km extra</td><td class="r dim" style="padding:5px 8px;">$4.20</td><td class="r dim" style="padding:5px 8px;">$10.50</td><td class="r dim" style="padding:5px 8px;">$9.45</td><td class="r dim" style="padding:5px 8px;">$12</td><td class="r dim" style="padding:5px 8px;">$13.65</td></tr>
-            </tbody>
-          </table>
-          <div style="padding:6px 14px;background:var(--text);border-top:1px solid hsl(229 50% 25%);">
-            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:white;">Auto — MXN</span>
-          </div>
-          <table class="tbl">
-            <thead>
-              <tr style="background:var(--bg);">
-                <th style="width:66px;font-size:9px;padding:6px 8px;">Dist.</th>
-                <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">UBER ◆</th>
+                <th style="width:60px;font-size:9px;padding:6px 10px;">Dist.</th>
+                <th class="r" style="font-size:9px;padding:6px 8px;">Carrier</th>
+                <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">UBER ★</th>
                 <th class="r" style="color:var(--celeste);font-size:9px;padding:6px 8px;">RAPPI</th>
                 <th class="r" style="font-size:9px;padding:6px 8px;">LALAMOVE</th>
-                <th class="r" style="color:var(--muted);font-size:9px;padding:6px 8px;">MU</th>
-                <th class="r" style="color:var(--muted);font-size:9px;padding:6px 8px;">PBOX</th>
+                <th class="r" style="font-size:9px;padding:6px 8px;">MU</th>
+                <th class="r" style="font-size:9px;padding:6px 8px;">PIBOX</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">0–3 km</td><td class="r g" style="font-size:11px;padding:6px 8px;">$75</td><td class="r g" style="font-size:11px;padding:6px 8px;">$99.90</td><td class="r" style="font-size:11px;padding:6px 8px;">$75</td><td class="r dim" style="padding:6px 8px;">—</td><td class="r dim" style="padding:6px 8px;">—</td></tr>
-              <tr><td style="font-size:10px;font-weight:600;padding:6px 8px;">10 km</td><td class="r" style="font-size:11px;padding:6px 8px;">$108.15</td><td class="r" style="font-size:11px;padding:6px 8px;">$240.87</td><td class="r" style="font-size:11px;padding:6px 8px;">$152.25</td><td class="r dim" style="padding:6px 8px;">—</td><td class="r dim" style="padding:6px 8px;">—</td></tr>
-              <tr><td style="font-size:9px;color:var(--muted);padding:5px 8px;">km extra</td><td class="r dim" style="padding:5px 8px;">$4.20</td><td class="r dim" style="padding:5px 8px;">$19.43</td><td class="r dim" style="padding:5px 8px;">$10.50</td><td class="r dim" style="padding:5px 8px;">—</td><td class="r dim" style="padding:5px 8px;">—</td></tr>
+              <tr style="background:hsl(193 100% 45% / .04);">
+                <td style="font-size:10px;font-weight:700;padding:7px 10px;">0–3 km</td>
+                <td class="r" style="font-size:9px;color:var(--muted);padding:7px 8px;">+ $7 + IVA</td>
+                <td class="r" style="padding:7px 8px;"><span style="font-size:11px;font-weight:800;color:var(--green-text);">$68.44</span></td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$70.76</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$77.92</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$107.56</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$66.12</td>
+              </tr>
+              <tr>
+                <td style="font-size:10px;font-weight:700;padding:7px 10px;">5 km</td>
+                <td class="r" style="font-size:9px;color:var(--muted);padding:7px 8px;">+ $7 + IVA</td>
+                <td class="r" style="padding:7px 8px;"><span style="font-size:11px;font-weight:800;color:var(--green-text);">$81.20</span></td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$98.25</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$102.00</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$140.59</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$100.49</td>
+              </tr>
+              <tr style="background:hsl(193 100% 45% / .04);">
+                <td style="font-size:10px;font-weight:700;padding:7px 10px;">7 km</td>
+                <td class="r" style="font-size:9px;color:var(--muted);padding:7px 8px;">+ $7 + IVA</td>
+                <td class="r" style="padding:7px 8px;"><span style="font-size:11px;font-weight:800;color:var(--green-text);">$90.94</span></td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$122.29</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$124.93</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$167.63</td>
+                <td class="r" style="font-size:11px;padding:7px 8px;">$133.00</td>
+              </tr>
+              <tr>
+                <td style="font-size:9px;color:var(--muted);padding:5px 10px;">km extra</td>
+                <td class="r dim" style="font-size:9px;padding:5px 8px;"> </td>
+                <td class="r dim" style="font-size:9px;padding:5px 8px;">$4.87</td>
+                <td class="r dim" style="font-size:9px;padding:5px 8px;">$12.18</td>
+                <td class="r dim" style="font-size:9px;padding:5px 8px;">$10.96</td>
+                <td class="r dim" style="font-size:9px;padding:5px 8px;">$13.92</td>
+                <td class="r dim" style="font-size:9px;padding:5px 8px;">$15.83</td>
+              </tr>
             </tbody>
           </table>
-          <div style="padding:6px 14px;background:var(--bg);font-size:9px;color:var(--muted);">◆ recaudo efectivo disponible · ★ tarifa más baja con recaudo · Todos los precios en MXN</div>
-        </div>
-        <!-- INTEGRACIÓN PROMO -->
-        <div style="background:var(--celeste-dim);border:2px solid var(--celeste-mid);border-radius:12px;padding:11px 16px;display:flex;align-items:center;gap:13px;">
-          <div style="font-size:24px;line-height:1;flex-shrink:0;">🚀</div>
-          <div>
-            <div style="font-size:12px;font-weight:800;color:var(--celeste);margin-bottom:2px;">Integración sin costo</div>
-            <div style="font-size:11px;color:var(--sub);">Si se activa en los primeros <strong style="color:var(--text);">30 días</strong> · VTEX nativa disponible</div>
-          </div>
+          <div style="padding:7px 14px;background:var(--bg);font-size:9px;color:var(--muted);">★ tarifa más baja · Todos los precios en MXN con IVA incluido · Pedidos en efectivo: solo Uber, Rappi y MU (+ 3.5% recaudo)</div>
         </div>
       </div>
-      <!-- RIGHT: ¿QUÉ PAGAS? + EJEMPLO+COMPARATIVO UNIFICADO -->
+
+      <!-- RIGHT: SIN IGUALA + EJEMPLO + CERO COMPROMISO -->
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <!-- LO QUE PAGAS -->
-        <div class="card" style="padding:16px 20px;">
-          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;">¿Qué pagas con Picker?</div>
-          <div style="background:var(--bg);border-radius:12px;padding:14px 10px;display:flex;align-items:center;justify-content:space-around;margin-bottom:12px;">
-            <div style="text-align:center;">
-              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Tarifa carrier</div>
-              <div style="font-size:22px;font-weight:900;color:var(--text);">$52–114</div>
-              <div style="font-size:8px;color:var(--sub);">según km · moto</div>
+
+        <!-- EJEMPLO REAL (de la sesión) -->
+        <div class="card" style="padding:16px 20px;border-top:3px solid var(--celeste);">
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Ejemplo — pedidos VTEX con Uber a 5 km</div>
+          <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;margin-bottom:12px;">
+            <div>
+              <div style="font-size:22px;font-weight:900;color:var(--text);">10</div>
+              <div style="font-size:8px;color:var(--muted);font-weight:600;">pedidos</div>
             </div>
-            <div style="font-size:24px;color:var(--border);font-weight:200;">+</div>
-            <div style="text-align:center;">
-              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Fee Picker</div>
-              <div style="font-size:30px;font-weight:900;color:var(--celeste);">$7</div>
-              <div style="font-size:8px;color:var(--sub);">MXN + IVA / envío</div>
+            <div style="font-size:16px;color:var(--border);">×</div>
+            <div>
+              <div style="font-size:22px;font-weight:900;color:var(--text);">$81.20</div>
+              <div style="font-size:8px;color:var(--muted);font-weight:600;">c/IVA incluido</div>
             </div>
-            <div style="font-size:24px;color:var(--border);font-weight:200;">=</div>
-            <div style="text-align:center;">
-              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Tu costo por envío</div>
-              <div style="font-size:30px;font-weight:900;color:var(--green-text);">$68–85</div>
-              <div style="font-size:8px;color:var(--sub);">MXN / envío · sin iguala fija mensual</div>
+            <div style="font-size:16px;color:var(--border);">=</div>
+            <div style="background:var(--celeste-dim);border:1.5px solid var(--celeste-mid);border-radius:10px;padding:8px 6px;">
+              <div style="font-size:22px;font-weight:900;color:var(--celeste);">$812</div>
+              <div style="font-size:8px;color:var(--sub);font-weight:600;">MXN total · facturado</div>
             </div>
           </div>
-          <div style="display:flex;gap:10px;">
-            <div style="flex:1;text-align:center;background:var(--green-dim);border:1.5px solid var(--green-mid);border-radius:10px;padding:10px 8px;">
-              <div style="font-size:8px;color:var(--green-text);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Iguala fija</div>
-              <div style="font-size:26px;font-weight:900;color:var(--green-text);">$0</div>
-              <div style="font-size:8px;color:var(--sub);">Solo pagas lo que usas</div>
-            </div>
-            <div style="flex:1;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 8px;">
-              <div style="font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Fee por local/mes</div>
-              <div style="font-size:20px;font-weight:700;color:var(--muted);text-decoration:line-through;">$1,000</div>
-              <div style="font-size:9px;color:var(--green-text);font-weight:800;">✓ Eliminado para Klyns</div>
-            </div>
-          </div>
+          <div style="font-size:10px;color:var(--sub);text-align:center;line-height:1.5;">Si el mes siguiente mandas 0 pedidos → pagas <strong style="color:var(--green-text);">$0</strong>. Sin preguntas.</div>
         </div>
-        <!-- ZERO COMMITMENT HERO -->
+
+        <!-- SIN IGUALA + SIN PLAZO -->
         <div style="background:var(--text);border-radius:14px;padding:16px 20px;display:grid;grid-template-columns:auto 1px 1fr;align-items:center;gap:0;">
-          <!-- BIG $0 -->
           <div style="padding-right:20px;text-align:center;">
             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:hsl(162 80% 60%);margin-bottom:6px;">Si no usas Picker</div>
             <div style="font-size:64px;font-weight:900;color:hsl(162 80% 65%);line-height:1;">$0</div>
             <div style="font-size:8px;color:hsl(212 50% 55%);margin-top:3px;font-weight:600;">pagas exactamente eso</div>
           </div>
           <div style="width:1px;height:70px;background:hsl(0 0% 100%/.12);"></div>
-          <!-- COMMITMENT LIST -->
           <div style="padding-left:20px;display:flex;flex-direction:column;gap:7px;">
             <div style="display:flex;align-items:center;gap:8px;">
               <div style="width:18px;height:18px;border-radius:50%;background:hsl(162 80% 65%/.15);border:1px solid hsl(162 80% 65%/.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:hsl(162 80% 65%);font-weight:900;">✓</div>
@@ -619,27 +643,16 @@
             </div>
           </div>
         </div>
-        <!-- VTEX CHANNEL ESTIMATE -->
-        <div class="card" style="padding:14px 18px;">
-          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Estimado canal online (pedidos ya pagados en línea)</div>
-          <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;margin-bottom:10px;">
-            <div>
-              <div style="font-size:18px;font-weight:900;color:var(--text);">1,500</div>
-              <div style="font-size:8px;color:var(--muted);font-weight:600;">pedidos VTEX/mes</div>
-            </div>
-            <div style="font-size:14px;color:var(--border);">×</div>
-            <div>
-              <div style="font-size:18px;font-weight:900;color:var(--text);">~$68</div>
-              <div style="font-size:8px;color:var(--muted);font-weight:600;">carrier + Picker</div>
-            </div>
-            <div style="font-size:14px;color:var(--border);">=</div>
-            <div style="background:var(--celeste-dim);border:1.5px solid var(--celeste-mid);border-radius:10px;padding:8px 6px;">
-              <div style="font-size:20px;font-weight:900;color:var(--celeste);">~$102K</div>
-              <div style="font-size:8px;color:var(--sub);font-weight:600;">MXN / mes · 100% variable</div>
-            </div>
+
+        <!-- INTEGRACIÓN + DIDI AGOSTO -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--celeste-dim);border:2px solid var(--celeste-mid);border-radius:12px;padding:11px 14px;">
+            <div style="font-size:11px;font-weight:800;color:var(--celeste);margin-bottom:3px;">🚀 Integración VTEX sin costo</div>
+            <div style="font-size:10px;color:var(--sub);">Activa en los primeros 30 días · nativa disponible</div>
           </div>
-          <div style="background:var(--green-dim);border:1px solid var(--green-mid);border-radius:8px;padding:8px 12px;font-size:10.5px;color:var(--green-text);font-weight:700;text-align:center;">
-            Si un mes no usas Picker → pagas $0. Sin preguntas.
+          <div style="background:var(--amber-bg);border:1.5px solid hsl(43 100% 45%/.3);border-radius:12px;padding:11px 14px;">
+            <div style="font-size:11px;font-weight:800;color:var(--amber);margin-bottom:3px;">🆕 DiDi · agosto 2026</div>
+            <div style="font-size:10px;color:var(--sub);">Nuevo carrier · mayor cobertura y disponibilidad</div>
           </div>
         </div>
       </div>
